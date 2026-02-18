@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -797,6 +798,36 @@
 
   .empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; display: block; opacity: 0.3; }
   .empty-state p { font-size: 14px; }
+
+  /* MODAL ACTIONS */
+  .modal-actions {
+    display: flex; gap: 8px;
+    padding: 16px 28px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+    border-radius: 0 0 16px 16px;
+  }
+  .btn-danger { background: rgba(247,92,92,0.12); color: var(--red); border: 1px solid rgba(247,92,92,0.3); }
+  .btn-danger:hover { background: rgba(247,92,92,0.22); }
+  .btn-edit { background: rgba(79,142,247,0.12); color: var(--accent); border: 1px solid rgba(79,142,247,0.3); }
+  .btn-edit:hover { background: rgba(79,142,247,0.22); }
+
+  /* ROW ACTIONS */
+  .row-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+  tbody tr:hover .row-actions { opacity: 1; }
+  .row-btn { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--border); background: var(--surface); transition: all 0.15s; color: var(--muted2); }
+  .row-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .row-btn.del:hover { border-color: var(--red); color: var(--red); }
+  .row-btn svg { width: 13px; height: 13px; }
+
+  /* CONFIRM */
+  .confirm-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .confirm-overlay.open { display: flex; }
+  .confirm-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; width: 380px; text-align: center; animation: modalIn 0.2s ease; }
+  .confirm-box .icon { font-size: 36px; margin-bottom: 12px; }
+  .confirm-box h4 { font-family: var(--font-head); font-size: 16px; margin-bottom: 8px; }
+  .confirm-box p { font-size: 13px; color: var(--muted2); margin-bottom: 20px; }
+  .confirm-btns { display: flex; gap: 10px; justify-content: center; }
 </style>
 </head>
 <body>
@@ -936,6 +967,7 @@
               <th>Placa</th>
               <th>Prazo</th>
               <th>Status</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody id="table-body"></tbody>
@@ -1086,6 +1118,60 @@
       </div>
     </div>
     <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="icon">🗑️</div>
+    <h4>Excluir processo?</h4>
+    <p id="confirm-text">Esta ação não pode ser desfeita.</p>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" onclick="document.getElementById('confirm-overlay').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-overlay" onclick="closeEditModal(event)">
+  <div class="modal" style="width:720px">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:linear-gradient(135deg,var(--accent2),var(--accent))">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </div>
+      <div><h3>Editar Processo</h3><p id="edit-sub">Altere os dados e salve</p></div>
+      <div class="modal-close" onclick="document.getElementById('edit-overlay').classList.remove('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="e-id">
+      <div class="form-grid">
+        <div class="form-field"><label>Empresa *</label><select id="e-empresa"><option value="">Selecione</option><option>Rio Novo</option><option>Xavante</option></select></div>
+        <div class="form-field"><label>Órgão *</label><select id="e-orgao"><option value="">Selecione</option><option>AGER</option><option>ANTT</option></select></div>
+        <div class="form-field"><label>Tipo *</label><select id="e-tipo"><option value="">Selecione</option><option>NOTIFICAÇÃO</option><option>RECURSO</option><option>IMPUGNAÇÃO</option><option>NOTIFICAÇÃO REGULATÓRIA</option><option>AUTUAÇÃO</option></select></div>
+        <div class="form-field"><label>Nº do Termo</label><input type="text" id="e-numero"></div>
+        <div class="form-field"><label>Data de Entrada *</label><input type="date" id="e-data"></div>
+        <div class="form-field"><label>Prazo Final</label><input type="date" id="e-prazo"></div>
+        <div class="form-field full"><label>Assunto *</label><input type="text" id="e-assunto"></div>
+        <div class="form-field"><label>Setor</label><select id="e-setor"><option value="">Selecione</option><option>OPERACIONAL</option><option>COMERCIAL</option><option>COMERCIAL/OPERACIONAL</option><option>OPERACIONAL/COMERCIAL</option><option>TECNOLOGIA DE INFORMAÇÃO</option><option>ADMINISTRATIVO</option></select></div>
+        <div class="form-field"><label>Local da Autuação</label><input type="text" id="e-local"></div>
+        <div class="form-field"><label>Prefixo</label><input type="text" id="e-prefixo"></div>
+        <div class="form-field"><label>Placa</label><input type="text" id="e-placa"></div>
+        <div class="form-field full"><label>Descrição / Histórico</label><textarea id="e-descricao"></textarea></div>
+        <div class="form-field"><label>Status</label><select id="e-status"><option>PENDENTE</option><option>EM ANÁLISE</option><option>RESPONDIDA</option><option>PROTOCOLADO</option><option>ENCERRADO</option></select></div>
+        <div class="form-field"><label>Observações</label><input type="text" id="e-obs"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('edit-overlay').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEdicao()" style="margin-left:auto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Salvar Alterações
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1344,6 +1430,16 @@ function renderTable() {
       <td style="font-size:12px;font-family:var(--font-head);font-weight:700">${r.placa || '—'}</td>
       <td class="${prazoClass}">${prazo}</td>
       <td><span class="status-dot ${stMap[st]}">${stLbl[st]}</span></td>
+      <td onclick="event.stopPropagation()">
+        <div class="row-actions">
+          <div class="row-btn" title="Editar" onclick="abrirEdicao(${r.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </div>
+          <div class="row-btn del" title="Excluir" onclick="confirmarExclusao(${r.id})">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          </div>
+        </div>
+      </td>
     </tr>`;
   }).join('');
 
@@ -1475,6 +1571,23 @@ function openModal(id) {
       </select>
     </div>`;
 
+  // Add action buttons to modal footer
+  const modal = document.getElementById('modal');
+  let existingActions = modal.querySelector('.modal-actions');
+  if (existingActions) existingActions.remove();
+  const actionsDiv = document.createElement('div');
+  actionsDiv.className = 'modal-actions';
+  actionsDiv.innerHTML = `
+    <button class="btn btn-danger" onclick="confirmarExclusao(${r.id})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      Excluir
+    </button>
+    <button class="btn btn-edit" style="margin-left:auto" onclick="abrirEdicao(${r.id})">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Editar
+    </button>`;
+  modal.appendChild(actionsDiv);
+
   document.getElementById('modal-overlay').classList.add('open');
 }
 
@@ -1489,6 +1602,92 @@ function closeModal(e) {
   if (e.target === document.getElementById('modal-overlay')) {
     document.getElementById('modal-overlay').classList.remove('open');
   }
+}
+
+function closeEditModal(e) {
+  if (e.target === document.getElementById('edit-overlay')) {
+    document.getElementById('edit-overlay').classList.remove('open');
+  }
+}
+
+function confirmarExclusao(id) {
+  const r = allRecords.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('confirm-text').textContent = `Excluir "${r.numero || 'processo'}" (${r.empresa} · ${r.orgao})?`;
+  const btn = document.getElementById('confirm-ok-btn');
+  btn.onclick = () => {
+    excluirProcesso(id);
+    document.getElementById('confirm-overlay').classList.remove('open');
+    document.getElementById('modal-overlay').classList.remove('open');
+  };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function excluirProcesso(id) {
+  allRecords = allRecords.filter(r => r.id !== id);
+  saveRecords();
+  applyFilters();
+  renderDashboard();
+  updateBadges();
+}
+
+function abrirEdicao(id) {
+  const r = allRecords.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('edit-sub').textContent = `${r.empresa} · ${r.orgao} · ${r.ano}`;
+  document.getElementById('e-id').value = r.id;
+  document.getElementById('e-empresa').value = r.empresa || '';
+  document.getElementById('e-orgao').value = r.orgao || '';
+  document.getElementById('e-tipo').value = r.tipo || '';
+  document.getElementById('e-numero').value = r.numero || '';
+  document.getElementById('e-data').value = r.data_entrada || '';
+  document.getElementById('e-prazo').value = (r.prazo && r.prazo.match(/^\d{4}-\d{2}-\d{2}$/)) ? r.prazo : '';
+  document.getElementById('e-assunto').value = r.assunto || '';
+  document.getElementById('e-setor').value = r.setor || '';
+  document.getElementById('e-local').value = r.local || '';
+  document.getElementById('e-prefixo').value = r.prefixo || '';
+  document.getElementById('e-placa').value = r.placa || '';
+  document.getElementById('e-descricao').value = r.descricao || '';
+  document.getElementById('e-status').value = r.status || 'PENDENTE';
+  document.getElementById('e-obs').value = r.obs || '';
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('edit-overlay').classList.add('open');
+}
+
+function salvarEdicao() {
+  const id = parseInt(document.getElementById('e-id').value);
+  const empresa = document.getElementById('e-empresa').value;
+  const orgao = document.getElementById('e-orgao').value;
+  const tipo = document.getElementById('e-tipo').value;
+  const assunto = document.getElementById('e-assunto').value;
+  const data = document.getElementById('e-data').value;
+  if (!empresa || !orgao || !tipo || !assunto || !data) {
+    alert('Preencha os campos obrigatórios (*)');
+    return;
+  }
+  const idx = allRecords.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  allRecords[idx] = {
+    ...allRecords[idx],
+    empresa, orgao, tipo,
+    numero: document.getElementById('e-numero').value || allRecords[idx].numero,
+    data_entrada: data,
+    prazo: document.getElementById('e-prazo').value || allRecords[idx].prazo,
+    assunto: assunto.toUpperCase(),
+    setor: document.getElementById('e-setor').value,
+    local: document.getElementById('e-local').value,
+    prefixo: document.getElementById('e-prefixo').value,
+    placa: document.getElementById('e-placa').value,
+    descricao: document.getElementById('e-descricao').value,
+    status: document.getElementById('e-status').value,
+    obs: document.getElementById('e-obs').value,
+    ano: new Date(data).getFullYear().toString(),
+  };
+  saveRecords();
+  applyFilters();
+  renderDashboard();
+  updateBadges();
+  document.getElementById('edit-overlay').classList.remove('open');
 }
 
 // ===== NOVO =====
@@ -1559,10 +1758,14 @@ function toggleTheme() {
   }
 })();
 
+function updateBadges() {
+  document.getElementById('badge-vencidos').textContent = allRecords.filter(r => getPrazoStatus(r) === 'vencido').length;
+  document.getElementById('badge-alertas').textContent = allRecords.filter(r => ['vencido','urgente'].includes(getPrazoStatus(r))).length;
+}
+
 // ===== INIT =====
 renderDashboard();
-document.getElementById('badge-vencidos').textContent = allRecords.filter(r => getPrazoStatus(r) === 'vencido').length;
-document.getElementById('badge-alertas').textContent = allRecords.filter(r => ['vencido','urgente'].includes(getPrazoStatus(r))).length;
+updateBadges();
 </script>
 </body>
 </html>
