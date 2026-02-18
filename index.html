@@ -162,6 +162,7 @@ tbody tr:hover .row-actions{opacity:1;}
 .form-field label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;}
 .form-field input,.form-field select,.form-field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;transition:border-color .2s;width:100%;}
 .form-field input:focus,.form-field select:focus,.form-field textarea:focus{border-color:var(--accent);}
+.form-field input[type=text],.form-field textarea{text-transform:uppercase;}
 .form-field textarea{resize:vertical;min-height:80px;}
 .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
 .confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
@@ -215,6 +216,40 @@ tbody tr:hover .row-actions{opacity:1;}
 </head>
 <body>
 
+
+<!-- LOGIN SCREEN -->
+<div id="login-overlay" style="display:flex;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 48px;width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+    <div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));padding:6px 14px;border-radius:20px;font-family:var(--font-head);font-size:11px;font-weight:700;letter-spacing:.1em;color:#fff;margin-bottom:20px;">⚖ JURÍDICO</div>
+    <h2 style="font-family:var(--font-head);font-size:22px;font-weight:800;margin-bottom:4px;">Termos de Notificação</h2>
+    <p style="font-size:13px;color:var(--muted2);margin-bottom:28px;">AGER &amp; ANTT — Acesso Restrito</p>
+    <div id="login-error" style="display:none;background:rgba(247,92,92,.12);border:1px solid rgba(247,92,92,.3);color:var(--red);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;">Usuário ou senha incorretos.</div>
+    <div style="display:flex;flex-direction:column;gap:12px;text-align:left;">
+      <div>
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:block;margin-bottom:5px;">Usuário</label>
+        <input id="login-user" type="text" placeholder="Digite seu usuário" autocomplete="username"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color .2s;"
+          onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"
+          onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      </div>
+      <div>
+        <label style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;display:block;margin-bottom:5px;">Senha</label>
+        <div style="position:relative;">
+          <input id="login-pass" type="password" placeholder="Digite sua senha" autocomplete="current-password"
+            style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 40px 10px 14px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;transition:border-color .2s;"
+            onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor=''"
+            onkeydown="if(event.key==='Enter')doLogin()">
+          <span onclick="togglePass()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:16px;" id="pass-eye">👁</span>
+        </div>
+      </div>
+      <button onclick="doLogin()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px;font-family:var(--font-head);font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;transition:opacity .15s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        ENTRAR
+      </button>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:20px;">Acesso somente para colaboradores autorizados</p>
+  </div>
+</div>
+
 <nav class="sidebar">
   <div class="logo">
     <div class="logo-badge">⚖ JURÍDICO</div>
@@ -237,8 +272,17 @@ tbody tr:hover .row-actions{opacity:1;}
     <div class="nav-item" onclick="showPage('novo')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Novo Termo
     </div>
+    <div class="nav-item" onclick="abrirMinhaSenha()" style="margin-top:4px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Minha Senha
+    </div>
+    <div id="nav-admin" style="display:none">
+      <div class="nav-section">Administração</div>
+      <div class="nav-item" onclick="showPage('usuarios')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuários
+      </div>
+    </div>
   </nav>
-  <div class="sidebar-footer">v2025 · Setor Jurídico</div>
+  <div class="sidebar-footer" style="display:flex;flex-direction:column;gap:8px;"><span>v2025 · Setor Jurídico</span><span id="logged-user" style="color:var(--accent);font-weight:600;font-size:12px;"></span><button onclick="doLogout()" style="background:rgba(247,92,92,.1);border:1px solid rgba(247,92,92,.3);color:var(--red);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font-body);">Sair</button></div>
 </nav>
 
 <main class="main">
@@ -321,7 +365,7 @@ tbody tr:hover .row-actions{opacity:1;}
             <div class="form-field"><label>Prazo Final</label><input type="date" id="n-prazo"></div>
             <div class="form-field full"><label>Assunto *</label><input type="text" id="n-assunto" placeholder="Ex: Atraso no horário de partida"></div>
             <div class="form-field"><label>Setor</label><select id="n-setor"><option value="">Selecione</option><option>OPERACIONAL</option><option>COMERCIAL</option><option>COMERCIAL/OPERACIONAL</option><option>OPERACIONAL/COMERCIAL</option><option>TECNOLOGIA DE INFORMAÇÃO</option><option>ADMINISTRATIVO</option></select></div>
-            <div class="form-field"><label>Local da Autuação</label><input type="text" id="n-local" placeholder="Ex: Cuiabá/MT"></div>
+            <div class="form-field"><label>Local da Autuação</label><select id="n-local"><option value="">Selecione</option><option>GOIÂNIA/GO</option><option>BARRA DO GARÇAS/MT</option><option>RIBEIRÃO CASCALHEIRA/MT</option><option>VILA RICA/MT</option><option>CUIABÁ/MT</option><option>SINOP/MT</option><option>IMPERATRIZ/MA</option></select></div>
             <div class="form-field"><label>Prefixo</label><input type="text" id="n-prefixo"></div>
             <div class="form-field"><label>Placa</label><input type="text" id="n-placa"></div>
             <div class="form-field full"><label>Descrição / Histórico</label><textarea id="n-descricao" placeholder="Descreva os fatos..."></textarea></div>
@@ -360,6 +404,33 @@ tbody tr:hover .row-actions{opacity:1;}
               Salvar Processo
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- USUARIOS -->
+    <div class="page" id="page-usuarios">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <h3 style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:4px;">Gerenciar Usuários</h3>
+          <p style="color:var(--muted2);font-size:13px;">Crie, edite ou exclua usuários do sistema.</p>
+        </div>
+        <button class="btn btn-primary" onclick="abrirNovoUser()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Novo Usuário
+        </button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Login</th><th>Nome</th><th>Perfil</th><th>Ações</th></tr></thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-top:16px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">🔐</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;margin-bottom:2px;">Admin — usuário fixo do sistema</div>
+          <div style="font-size:12px;color:var(--muted2);">Login: <strong>ADMIN</strong> · Senha padrão: <strong>admin123</strong></div>
         </div>
       </div>
     </div>
@@ -406,7 +477,7 @@ tbody tr:hover .row-actions{opacity:1;}
         <div class="form-field"><label>Prazo Final</label><input type="date" id="e-prazo"></div>
         <div class="form-field full"><label>Assunto *</label><input type="text" id="e-assunto"></div>
         <div class="form-field"><label>Setor</label><select id="e-setor"><option value="">Selecione</option><option>OPERACIONAL</option><option>COMERCIAL</option><option>COMERCIAL/OPERACIONAL</option><option>OPERACIONAL/COMERCIAL</option><option>TECNOLOGIA DE INFORMAÇÃO</option><option>ADMINISTRATIVO</option></select></div>
-        <div class="form-field"><label>Local</label><input type="text" id="e-local"></div>
+        <div class="form-field"><label>Local da Autuação</label><select id="e-local"><option value="">Selecione</option><option>GOIÂNIA/GO</option><option>BARRA DO GARÇAS/MT</option><option>RIBEIRÃO CASCALHEIRA/MT</option><option>VILA RICA/MT</option><option>CUIABÁ/MT</option><option>SINOP/MT</option><option>IMPERATRIZ/MA</option></select></div>
         <div class="form-field"><label>Prefixo</label><input type="text" id="e-prefixo"></div>
         <div class="form-field"><label>Placa</label><input type="text" id="e-placa"></div>
         <div class="form-field full"><label>Descrição / Histórico</label><textarea id="e-descricao"></textarea></div>
@@ -448,6 +519,93 @@ tbody tr:hover .row-actions{opacity:1;}
   </div>
 </div>
 
+<!-- MODAL: NOVO/EDIT USUARIO -->
+<div class="modal-overlay" id="user-modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:480px">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:linear-gradient(135deg,#22c981,#4f8ef7)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div><h3 id="user-modal-title">Novo Usuário</h3><p>Preencha os dados de acesso</p></div>
+      <div class="modal-close" onclick="document.getElementById('user-modal-overlay').classList.remove('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="u-idx">
+      <div class="form-grid">
+        <div class="form-field"><label>Login (Usuário) *</label><input type="text" id="u-user" placeholder="Ex: JOAO" style="text-transform:uppercase"></div>
+        <div class="form-field"><label>Nome Completo *</label><input type="text" id="u-nome" placeholder="Ex: JOÃO SILVA"></div>
+        <div class="form-field"><label>Perfil</label>
+          <select id="u-role">
+            <option value="user">Usuário</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="form-field" id="u-pass-row">
+          <label>Senha * <span style="font-size:10px;color:var(--muted)">(deixe em branco para manter)</span></label>
+          <div style="position:relative">
+            <input type="password" id="u-pass" placeholder="Nova senha" style="text-transform:none!important">
+            <span onclick="togglePassById('u-pass','u-pass-eye')" id="u-pass-eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)">👁</span>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Confirmar Senha *</label>
+          <div style="position:relative">
+            <input type="password" id="u-pass2" placeholder="Repita a senha" style="text-transform:none!important">
+            <span onclick="togglePassById('u-pass2','u-pass2-eye')" id="u-pass2-eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)">👁</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('user-modal-overlay').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarUser()" style="margin-left:auto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>Salvar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: MINHA SENHA -->
+<div class="modal-overlay" id="minha-senha-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <div class="modal-icon" style="background:linear-gradient(135deg,var(--orange),var(--red))">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+      <div><h3>Alterar Minha Senha</h3><p>Defina uma nova senha de acesso</p></div>
+      <div class="modal-close" onclick="document.getElementById('minha-senha-overlay').classList.remove('open')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field full">
+          <label>Nova Senha *</label>
+          <div style="position:relative">
+            <input type="password" id="my-pass" placeholder="Mínimo 4 caracteres" style="text-transform:none!important">
+            <span onclick="togglePassById('my-pass','my-pass-eye')" id="my-pass-eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)">👁</span>
+          </div>
+        </div>
+        <div class="form-field full">
+          <label>Confirmar Nova Senha *</label>
+          <div style="position:relative">
+            <input type="password" id="my-pass2" placeholder="Repita a senha" style="text-transform:none!important">
+            <span onclick="togglePassById('my-pass2','my-pass2-eye')" id="my-pass2-eye" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted)">👁</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="document.getElementById('minha-senha-overlay').classList.remove('open')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMinhaSenha()" style="margin-left:auto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/></svg>Salvar Senha
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- CONFIRM: EXCLUIR -->
 <div class="confirm-overlay" id="confirm-overlay">
   <div class="confirm-box">
@@ -469,6 +627,222 @@ tbody tr:hover .row-actions{opacity:1;}
 </div>
 
 <script>
+// ===== USERS & AUTH =====
+const ADMIN_CRED = { user: 'ADMIN', pass: 'admin123', nome: 'Administrador', role: 'admin' };
+
+function loadUsers() {
+  try {
+    const s = localStorage.getItem('tn_users');
+    return s ? JSON.parse(s) : [];
+  } catch(e) { return []; }
+}
+
+function saveUsers(users) {
+  try { localStorage.setItem('tn_users', JSON.stringify(users)); } catch(e) {}
+}
+
+function getAllUsers() {
+  return [ADMIN_CRED, ...loadUsers()];
+}
+
+let currentUser = null;
+
+function doLogin() {
+  const u = document.getElementById('login-user').value.toUpperCase().trim();
+  const p = document.getElementById('login-pass').value.trim();
+  const found = getAllUsers().find(x => x.user === u && x.pass === p);
+  if (!found) {
+    document.getElementById('login-error').style.display = 'block';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-user').focus();
+    return;
+  }
+  currentUser = found;
+  document.getElementById('login-error').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('logged-user').textContent = '👤 ' + found.nome;
+  sessionStorage.setItem('tn_logged', JSON.stringify({user: found.user, nome: found.nome, role: found.role||'user'}));
+  // Show admin nav if admin
+  const adminNav = document.getElementById('nav-admin');
+  if (adminNav) adminNav.style.display = found.role === 'admin' ? 'block' : 'none';
+}
+
+function doLogout() {
+  currentUser = null;
+  sessionStorage.removeItem('tn_logged');
+  document.getElementById('login-user').value = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-overlay').style.display = 'flex';
+  document.getElementById('logged-user').textContent = '';
+  const adminNav = document.getElementById('nav-admin');
+  if (adminNav) adminNav.style.display = 'none';
+}
+
+function togglePass() {
+  const inp = document.getElementById('login-pass');
+  const eye = document.getElementById('pass-eye');
+  if (inp.type === 'password') { inp.type = 'text'; eye.textContent = '🙈'; }
+  else { inp.type = 'password'; eye.textContent = '👁'; }
+}
+
+function togglePassById(inpId, eyeId) {
+  const inp = document.getElementById(inpId);
+  const eye = document.getElementById(eyeId);
+  if (!inp || !eye) return;
+  if (inp.type === 'password') { inp.type = 'text'; eye.textContent = '🙈'; }
+  else { inp.type = 'password'; eye.textContent = '👁'; }
+}
+
+// Check if already logged in this session
+(function checkSession() {
+  const s = sessionStorage.getItem('tn_logged');
+  if (s) {
+    try {
+      const d = JSON.parse(s);
+      currentUser = getAllUsers().find(x => x.user === d.user) || null;
+      document.getElementById('login-overlay').style.display = 'none';
+      document.getElementById('logged-user').textContent = '👤 ' + d.nome;
+      const adminNav = document.getElementById('nav-admin');
+      if (adminNav) adminNav.style.display = d.role === 'admin' ? 'block' : 'none';
+    } catch(e) {}
+  }
+})();
+
+// ===== USER MANAGEMENT =====
+function showUsuarios() {
+  showPage('usuarios');
+}
+
+function renderUsuarios() {
+  const users = loadUsers();
+  const tbody = document.getElementById('users-tbody');
+  if (!users.length) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--muted)">Nenhum usuário cadastrado além do Admin.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = users.map((u, i) => `
+    <tr>
+      <td style="font-family:var(--font-head);font-weight:700">${u.user}</td>
+      <td>${u.nome}</td>
+      <td><span class="tag tag-ager">${u.role === 'admin' ? 'Admin' : 'Usuário'}</span></td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-edit" style="padding:5px 10px;font-size:12px" onclick="abrirEditUser(${i})">✏️ Editar</button>
+        <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="excluirUser(${i})">🗑️ Excluir</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirNovoUser() {
+  document.getElementById('user-modal-title').textContent = 'Novo Usuário';
+  document.getElementById('u-idx').value = '-1';
+  document.getElementById('u-user').value = '';
+  document.getElementById('u-nome').value = '';
+  document.getElementById('u-pass').value = '';
+  document.getElementById('u-pass2').value = '';
+  document.getElementById('u-role').value = 'user';
+  document.getElementById('u-pass-row').style.display = '';
+  document.getElementById('user-modal-overlay').classList.add('open');
+}
+
+function abrirEditUser(i) {
+  const users = loadUsers();
+  const u = users[i];
+  if (!u) return;
+  document.getElementById('user-modal-title').textContent = 'Editar Usuário';
+  document.getElementById('u-idx').value = i;
+  document.getElementById('u-user').value = u.user;
+  document.getElementById('u-nome').value = u.nome;
+  document.getElementById('u-pass').value = '';
+  document.getElementById('u-pass2').value = '';
+  document.getElementById('u-role').value = u.role || 'user';
+  document.getElementById('u-pass-row').style.display = '';
+  document.getElementById('user-modal-overlay').classList.add('open');
+}
+
+function salvarUser() {
+  const idx = parseInt(document.getElementById('u-idx').value);
+  const user = document.getElementById('u-user').value.toUpperCase().trim();
+  const nome = document.getElementById('u-nome').value.toUpperCase().trim();
+  const pass = document.getElementById('u-pass').value.trim();
+  const pass2 = document.getElementById('u-pass2').value.trim();
+  const role = document.getElementById('u-role').value;
+
+  if (!user || !nome) { alert('Preencha usuário e nome.'); return; }
+  if (user === 'ADMIN') { alert('Não é possível criar um usuário com o nome ADMIN.'); return; }
+
+  const users = loadUsers();
+
+  // Validate password
+  if (idx === -1) {
+    // new user — password required
+    if (!pass) { alert('Informe uma senha para o novo usuário.'); return; }
+  }
+  if (pass || idx === -1) {
+    if (pass !== pass2) { alert('As senhas não coincidem.'); return; }
+    if (pass.length < 4) { alert('A senha deve ter pelo menos 4 caracteres.'); return; }
+  }
+
+  // Check duplicate username
+  const dupIdx = users.findIndex((u, i) => u.user === user && i !== idx);
+  if (dupIdx !== -1) { alert('Já existe um usuário com esse nome.'); return; }
+
+  if (idx === -1) {
+    users.push({ user, nome, pass, role });
+  } else {
+    users[idx] = { user, nome, pass: pass || users[idx].pass, role };
+  }
+
+  saveUsers(users);
+  document.getElementById('user-modal-overlay').classList.remove('open');
+  renderUsuarios();
+  toast(`✅ Usuário "${user}" salvo!`);
+}
+
+function excluirUser(i) {
+  const users = loadUsers();
+  const u = users[i];
+  if (!u) return;
+  document.getElementById('confirm-text').textContent = `Excluir usuário "${u.user}" (${u.nome})?`;
+  document.getElementById('confirm-btn').onclick = () => {
+    users.splice(i, 1);
+    saveUsers(users);
+    document.getElementById('confirm-overlay').classList.remove('open');
+    renderUsuarios();
+    toast('🗑️ Usuário excluído.');
+  };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function abrirMinhaSenha() {
+  document.getElementById('my-pass').value = '';
+  document.getElementById('my-pass2').value = '';
+  document.getElementById('minha-senha-overlay').classList.add('open');
+}
+
+function salvarMinhaSenha() {
+  const pass = document.getElementById('my-pass').value.trim();
+  const pass2 = document.getElementById('my-pass2').value.trim();
+  if (!pass) { alert('Informe a nova senha.'); return; }
+  if (pass !== pass2) { alert('As senhas não coincidem.'); return; }
+  if (pass.length < 4) { alert('A senha deve ter pelo menos 4 caracteres.'); return; }
+  if (!currentUser) return;
+
+  if (currentUser.user === 'ADMIN') {
+    alert('A senha do Admin é fixa e não pode ser alterada aqui.');
+    return;
+  }
+
+  const users = loadUsers();
+  const idx = users.findIndex(u => u.user === currentUser.user);
+  if (idx !== -1) {
+    users[idx].pass = pass;
+    saveUsers(users);
+    currentUser.pass = pass;
+  }
+  document.getElementById('minha-senha-overlay').classList.remove('open');
+  toast('✅ Senha alterada com sucesso!');
+}
+
 // ===== STORAGE =====
 function loadRecords(){ try{ const s=localStorage.getItem('tn_records'); return s?JSON.parse(s):[]; }catch(e){ return []; } }
 function saveRecords(){ try{ localStorage.setItem('tn_records',JSON.stringify(allRecords)); }catch(e){} }
@@ -511,6 +885,7 @@ function showPage(name){
   if(name==='dashboard') renderDashboard();
   if(name==='lista'){ filtered=[...allRecords]; currentPage=1; renderTable(); }
   if(name==='alertas') renderAlertas();
+  if(name==='usuarios') renderUsuarios();
 }
 
 // ===== DASHBOARD =====
