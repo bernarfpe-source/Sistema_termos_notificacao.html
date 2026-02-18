@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -176,6 +177,40 @@ tbody tr:hover .row-actions{opacity:1;}
 ::-webkit-scrollbar{width:6px;height:6px;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+/* UPLOAD AREAS */
+.upload-section{margin-top:20px;padding-top:18px;border-top:1px solid var(--border);}
+.upload-section-title{font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:14px;color:var(--text);}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.upload-box{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--surface2);}
+.upload-box:hover{border-color:var(--accent);background:rgba(79,142,247,.05);}
+.upload-box.has-image{border-style:solid;border-color:var(--green);}
+.upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-box-icon{font-size:24px;margin-bottom:6px;}
+.upload-box-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;}
+.upload-box-sub{font-size:10px;color:var(--muted2);}
+.upload-preview{width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:6px;display:block;}
+.upload-remove{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;z-index:2;opacity:0;transition:opacity .15s;}
+.upload-box:hover .upload-remove{opacity:1;}
+.upload-remove:hover{transform:scale(1.1);}
+
+/* VALOR */
+.valor-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(34,201,129,.12);color:var(--green);border:1px solid rgba(34,201,129,.3);border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;font-family:var(--font-head);}
+.valor-input-wrap{position:relative;}
+.valor-input-wrap::before{content:'R$';position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;font-weight:600;pointer-events:none;}
+.valor-input-wrap input{padding-left:32px !important;}
+
+/* IMAGE VIEWER */
+.img-viewer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.img-viewer-overlay.open{display:flex;}
+.img-viewer-overlay img{max-width:90vw;max-height:90vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.img-viewer-close{position:fixed;top:20px;right:24px;font-size:28px;color:#fff;cursor:pointer;opacity:.7;}
+.img-viewer-close:hover{opacity:1;}
+.img-thumb-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+.img-thumb{width:80px;height:60px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid var(--border);transition:border-color .15s;}
+.img-thumb:hover{border-color:var(--accent);}
+.img-thumb-label{font-size:10px;color:var(--muted);text-align:center;margin-top:3px;}
+.img-thumb-wrap{display:flex;flex-direction:column;align-items:center;}
 </style>
 </head>
 <body>
@@ -254,7 +289,7 @@ tbody tr:hover .row-actions{opacity:1;}
         <table>
           <thead><tr>
             <th>Nº</th><th>Empresa</th><th>Órgão</th><th>Tipo</th>
-            <th>Assunto</th><th>Local</th><th>Placa</th><th>Prazo</th><th>Status</th><th>Ações</th>
+            <th>Assunto</th><th>Local</th><th>Placa</th><th>Prazo</th><th>Status</th><th>Valor</th><th>Ações</th>
           </tr></thead>
           <tbody id="table-body"></tbody>
         </table>
@@ -292,6 +327,31 @@ tbody tr:hover .row-actions{opacity:1;}
             <div class="form-field full"><label>Descrição / Histórico</label><textarea id="n-descricao" placeholder="Descreva os fatos..."></textarea></div>
             <div class="form-field"><label>Status</label><select id="n-status"><option>PENDENTE</option><option>EM ANÁLISE</option><option>RESPONDIDA</option><option>PROTOCOLADO</option><option>ENCERRADO</option></select></div>
             <div class="form-field"><label>Observações</label><input type="text" id="n-obs" placeholder="Informações adicionais"></div>
+            <div class="form-field"><label>💰 Valor da Autuação (R$)</label><div class="valor-input-wrap"><input type="number" id="n-valor" placeholder="0,00" step="0.01" min="0"></div></div>
+          </div>
+          <!-- UPLOADS NOVO -->
+          <div class="upload-section">
+            <div class="upload-section-title">📎 Documentos do Processo</div>
+            <div class="upload-grid">
+              <div class="upload-box" id="n-box-autua" onclick="setActiveUpload('n','autua')" title="Clique, arraste ou cole com Ctrl+V">
+                <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'n','autua')">
+                <div class="upload-box-icon">📄</div>
+                <div class="upload-box-label">Autuação</div>
+                <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>
+              </div>
+              <div class="upload-box" id="n-box-defesa" onclick="setActiveUpload('n','defesa')" title="Clique, arraste ou cole com Ctrl+V">
+                <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'n','defesa')">
+                <div class="upload-box-icon">🛡️</div>
+                <div class="upload-box-label">Defesa</div>
+                <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>
+              </div>
+              <div class="upload-box" id="n-box-decisao" onclick="setActiveUpload('n','decisao')" title="Clique, arraste ou cole com Ctrl+V">
+                <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'n','decisao')">
+                <div class="upload-box-icon">⚖️</div>
+                <div class="upload-box-label">Decisão</div>
+                <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>
+              </div>
+            </div>
           </div>
           <div class="form-actions">
             <button class="btn btn-ghost" onclick="showPage('lista')">Cancelar</button>
@@ -352,6 +412,31 @@ tbody tr:hover .row-actions{opacity:1;}
         <div class="form-field full"><label>Descrição / Histórico</label><textarea id="e-descricao"></textarea></div>
         <div class="form-field"><label>Status</label><select id="e-status"><option>PENDENTE</option><option>EM ANÁLISE</option><option>RESPONDIDA</option><option>PROTOCOLADO</option><option>ENCERRADO</option></select></div>
         <div class="form-field"><label>Observações</label><input type="text" id="e-obs"></div>
+        <div class="form-field"><label>💰 Valor da Autuação (R$)</label><div class="valor-input-wrap"><input type="number" id="e-valor" placeholder="0,00" step="0.01" min="0"></div></div>
+      </div>
+      <!-- UPLOADS EDIT -->
+      <div class="upload-section">
+        <div class="upload-section-title">📎 Documentos do Processo</div>
+        <div class="upload-grid">
+          <div class="upload-box" id="e-box-autua" onclick="setActiveUpload('e','autua')" title="Clique, arraste ou cole com Ctrl+V">
+            <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'e','autua')">
+            <div class="upload-box-icon">📄</div>
+            <div class="upload-box-label">Autuação</div>
+            <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>
+          </div>
+          <div class="upload-box" id="e-box-defesa" onclick="setActiveUpload('e','defesa')" title="Clique, arraste ou cole com Ctrl+V">
+            <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'e','defesa')">
+            <div class="upload-box-icon">🛡️</div>
+            <div class="upload-box-label">Defesa</div>
+            <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>
+          </div>
+          <div class="upload-box" id="e-box-decisao" onclick="setActiveUpload('e','decisao')" title="Clique, arraste ou cole com Ctrl+V">
+            <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'e','decisao')">
+            <div class="upload-box-icon">⚖️</div>
+            <div class="upload-box-label">Decisão</div>
+            <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -374,6 +459,13 @@ tbody tr:hover .row-actions{opacity:1;}
       <button class="btn btn-danger" id="confirm-btn">Excluir</button>
     </div>
   </div>
+</div>
+
+
+<!-- IMAGE VIEWER -->
+<div class="img-viewer-overlay" id="img-viewer" onclick="document.getElementById('img-viewer').classList.remove('open')">
+  <div class="img-viewer-close" onclick="document.getElementById('img-viewer').classList.remove('open')">✕</div>
+  <img id="img-viewer-src" src="" alt="">
 </div>
 
 <script>
@@ -427,11 +519,13 @@ function renderDashboard(){
   const venc=allRecords.filter(r=>getStatus(r)==='vencido').length;
   const urg=allRecords.filter(r=>getStatus(r)==='urgente').length;
   const enc=allRecords.filter(r=>getStatus(r)==='encerrado').length;
+  const multas = totalMultas();
+  const multaFmt = multas.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
   document.getElementById('stats-grid').innerHTML=`
     <div class="stat-card blue"><div class="stat-label">Total de Processos</div><div class="stat-value">${total}</div><div class="stat-sub">Todos os registros</div></div>
     <div class="stat-card red"><div class="stat-label">Prazos Vencidos</div><div class="stat-value" style="color:var(--red)">${venc}</div><div class="stat-sub">Requerem atenção</div></div>
     <div class="stat-card yellow"><div class="stat-label">Urgentes (7 dias)</div><div class="stat-value" style="color:var(--yellow)">${urg}</div><div class="stat-sub">Em alerta</div></div>
-    <div class="stat-card green"><div class="stat-label">Encerrados</div><div class="stat-value" style="color:var(--green)">${enc}</div><div class="stat-sub">Finalizados</div></div>`;
+    <div class="stat-card green" style="grid-column:span 1"><div class="stat-label">💰 Total em Multas</div><div class="stat-value" style="font-size:20px;color:var(--green)">R$ ${multaFmt}</div><div class="stat-sub">${allRecords.filter(r=>r.valor).length} proc. com valor</div></div>`;
   updateBadges();
   // Assuntos
   const ac={};
@@ -545,6 +639,7 @@ function renderTable(){
       <td style="font-size:12px;font-family:var(--font-head);font-weight:700">${r.placa||'—'}</td>
       <td class="${pc}">${prazoFmt(r)}</td>
       <td><span class="status-dot ${SC[st]}">${SL[st]}</span></td>
+      <td>${r.valor?`<span class="valor-badge" style="font-size:10px">R$ ${Number(r.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>`:'—'}</td>
       <td onclick="event.stopPropagation()">
         <div class="row-actions">
           <div class="row-btn" title="Editar" onclick="openEditar(${r.id})">
@@ -630,7 +725,18 @@ function openDetalhe(id){
         <option value="">— Atualizar status —</option>
         <option>PENDENTE</option><option>EM ANÁLISE</option><option>RESPONDIDA</option><option>PROTOCOLADO</option><option>ENCERRADO</option>
       </select>
-    </div>`;
+    </div>
+    ${r.valor?`<div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"><label style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;display:block;margin-bottom:6px">Valor da Autuação</label><span class="valor-badge">R$ ${Number(r.valor).toLocaleString('pt-BR',{minimumFractionDigits:2})}</span></div>`:''}
+    ${(r.img_autua||r.img_defesa||r.img_decisao)?`
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600;margin-bottom:10px">Documentos</div>
+      <div class="img-thumb-row">
+        ${r.img_autua?`<div class="img-thumb-wrap"><img class="img-thumb" src="${r.img_autua}" onclick="viewImg('${r.img_autua}')" title="Ver autuação"><div class="img-thumb-label">Autuação</div></div>`:''}
+        ${r.img_defesa?`<div class="img-thumb-wrap"><img class="img-thumb" src="${r.img_defesa}" onclick="viewImg('${r.img_defesa}')" title="Ver defesa"><div class="img-thumb-label">Defesa</div></div>`:''}
+        ${r.img_decisao?`<div class="img-thumb-wrap"><img class="img-thumb" src="${r.img_decisao}" onclick="viewImg('${r.img_decisao}')" title="Ver decisão"><div class="img-thumb-label">Decisão</div></div>`:''}
+      </div>
+    </div>`:''}
+    `;
   document.getElementById('det-btn-excluir').onclick=()=>pedirExclusao(id);
   document.getElementById('det-btn-editar').onclick=()=>openEditar(id);
   document.getElementById('modal-detail-overlay').classList.add('open');
@@ -663,6 +769,13 @@ function openEditar(id){
   document.getElementById('e-descricao').value=r.descricao||'';
   document.getElementById('e-status').value=r.status||'PENDENTE';
   document.getElementById('e-obs').value=r.obs||'';
+  document.getElementById('e-valor').value=r.valor||'';
+  // Load existing images
+  ['autua','defesa','decisao'].forEach(t=>resetUploadBox('e',t));
+  if (!tempUploads['e']) tempUploads['e']={};
+  if(r.img_autua) loadUploadBox('e','autua',r.img_autua);
+  if(r.img_defesa) loadUploadBox('e','defesa',r.img_defesa);
+  if(r.img_decisao) loadUploadBox('e','decisao',r.img_decisao);
   document.getElementById('modal-detail-overlay').classList.remove('open');
   document.getElementById('modal-edit-overlay').classList.add('open');
 }
@@ -690,6 +803,10 @@ function salvarEdicao(){
     descricao: document.getElementById('e-descricao').value,
     status: document.getElementById('e-status').value,
     obs: document.getElementById('e-obs').value,
+    valor: document.getElementById('e-valor').value||'',
+    img_autua: tempUploads['e']?.autua !== undefined ? tempUploads['e'].autua : allRecords[idx].img_autua||'',
+    img_defesa: tempUploads['e']?.defesa !== undefined ? tempUploads['e'].defesa : allRecords[idx].img_defesa||'',
+    img_decisao: tempUploads['e']?.decisao !== undefined ? tempUploads['e'].decisao : allRecords[idx].img_decisao||'',
     ano: new Date(data+'T12:00:00').getFullYear().toString(),
   };
   saveRecords();
@@ -736,15 +853,143 @@ function salvarNovo(){
     descricao: document.getElementById('n-descricao').value,
     status: document.getElementById('n-status').value,
     obs: document.getElementById('n-obs').value,
+    valor: document.getElementById('n-valor').value||'',
+    img_autua: tempUploads['n']?.autua||'',
+    img_defesa: tempUploads['n']?.defesa||'',
+    img_decisao: tempUploads['n']?.decisao||'',
     ano: new Date(data+'T12:00:00').getFullYear().toString(),
   };
   allRecords.unshift(rec);
   saveRecords();
   ['n-empresa','n-orgao','n-tipo','n-setor','n-status'].forEach(id=>document.getElementById(id).value='');
-  ['n-numero','n-data','n-prazo','n-assunto','n-local','n-prefixo','n-placa','n-descricao','n-obs'].forEach(id=>document.getElementById(id).value='');
+  ['n-numero','n-data','n-prazo','n-assunto','n-local','n-prefixo','n-placa','n-descricao','n-obs','n-valor'].forEach(id=>document.getElementById(id).value='');
+  ['autua','defesa','decisao'].forEach(t=>resetUploadBox('n',t));
+  delete tempUploads['n'];
   showPage('lista');
   toast(`✅ Processo "${rec.numero}" cadastrado!`);
 }
+
+
+// ===== UPLOADS =====
+const tempUploads = {}; // prefix -> {autua, defesa, decisao}
+
+function handleUpload(input, prefix, tipo) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = e.target.result;
+    if (!tempUploads[prefix]) tempUploads[prefix] = {};
+    tempUploads[prefix][tipo] = data;
+    const box = document.getElementById(`${prefix}-box-${tipo}`);
+    if (box) {
+      const isImg = file.type.startsWith('image/');
+      box.classList.add('has-image');
+      box.innerHTML = `
+        <div class="upload-remove" onclick="removeUpload('${prefix}','${tipo}',event)">✕</div>
+        ${isImg ? `<img class="upload-preview" src="${data}">` : `<div style="font-size:28px;margin-bottom:6px">📎</div>`}
+        <div class="upload-box-label" style="color:var(--green)">${tipo.charAt(0).toUpperCase()+tipo.slice(1)}</div>
+        <div class="upload-box-sub" style="color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px">${file.name}</div>`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeUpload(prefix, tipo, event) {
+  event.stopPropagation();
+  if (tempUploads[prefix]) delete tempUploads[prefix][tipo];
+  const box = document.getElementById(`${prefix}-box-${tipo}`);
+  if (box) {
+    box.classList.remove('has-image');
+    const icons = {autua:'📄', defesa:'🛡️', decisao:'⚖️'};
+    const labels = {autua:'Autuação', defesa:'Defesa', decisao:'Decisão'};
+    box.innerHTML = `
+      <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'${prefix}','${tipo}')">
+      <div class="upload-box-icon">${icons[tipo]}</div>
+      <div class="upload-box-label">${labels[tipo]}</div>
+      <div class="upload-box-sub">Clique ou arraste</div>`;
+  }
+}
+
+function resetUploadBox(prefix, tipo) {
+  if (tempUploads[prefix]) delete tempUploads[prefix][tipo];
+  const box = document.getElementById(`${prefix}-box-${tipo}`);
+  if (box) {
+    box.classList.remove('has-image');
+    const icons = {autua:'📄', defesa:'🛡️', decisao:'⚖️'};
+    const labels = {autua:'Autuação', defesa:'Defesa', decisao:'Decisão'};
+    box.innerHTML = `
+      <input type="file" accept="image/*,application/pdf" onchange="handleUpload(this,'${prefix}','${tipo}')">
+      <div class="upload-box-icon">${icons[tipo]}</div>
+      <div class="upload-box-label">${labels[tipo]}</div>
+      <div class="upload-box-sub">Clique, arraste ou Ctrl+V</div>`;
+    box.onclick = () => setActiveUpload(prefix, tipo);
+  }
+}
+
+function loadUploadBox(prefix, tipo, data) {
+  if (!data) return;
+  if (!tempUploads[prefix]) tempUploads[prefix] = {};
+  tempUploads[prefix][tipo] = data;
+  const box = document.getElementById(`${prefix}-box-${tipo}`);
+  if (!box) return;
+  const isImg = data.startsWith('data:image');
+  box.classList.add('has-image');
+  box.innerHTML = `
+    <div class="upload-remove" onclick="removeUpload('${prefix}','${tipo}',event)">✕</div>
+    ${isImg ? `<img class="upload-preview" src="${data}">` : `<div style="font-size:28px;margin-bottom:6px">📎</div>`}
+    <div class="upload-box-label" style="color:var(--green)">${tipo.charAt(0).toUpperCase()+tipo.slice(1)}</div>
+    <div class="upload-box-sub" style="color:var(--muted2)">Arquivo carregado</div>`;
+}
+
+function viewImg(src) {
+  document.getElementById('img-viewer-src').src = src;
+  document.getElementById('img-viewer').classList.add('open');
+}
+
+// Dashboard: total multas
+function totalMultas() {
+  return allRecords.reduce((acc, r) => acc + (parseFloat(r.valor)||0), 0);
+}
+
+
+// ===== CTRL+V PASTE INTO UPLOAD BOXES =====
+let activeUploadPrefix = null;
+let activeUploadTipo = null;
+
+function setActiveUpload(prefix, tipo) {
+  activeUploadPrefix = prefix;
+  activeUploadTipo = tipo;
+}
+
+document.addEventListener('paste', function(e) {
+  if (!activeUploadPrefix || !activeUploadTipo) return;
+  const items = (e.clipboardData || e.originalEvent?.clipboardData)?.items;
+  if (!items) return;
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].type.startsWith('image/')) {
+      const blob = items[i].getAsFile();
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const data = ev.target.result;
+        if (!tempUploads[activeUploadPrefix]) tempUploads[activeUploadPrefix] = {};
+        tempUploads[activeUploadPrefix][activeUploadTipo] = data;
+        const box = document.getElementById(`${activeUploadPrefix}-box-${activeUploadTipo}`);
+        if (box) {
+          box.classList.add('has-image');
+          box.innerHTML = `
+            <div class="upload-remove" onclick="removeUpload('${activeUploadPrefix}','${activeUploadTipo}',event)">✕</div>
+            <img class="upload-preview" src="${data}">
+            <div class="upload-box-label" style="color:var(--green)">${activeUploadTipo.charAt(0).toUpperCase()+activeUploadTipo.slice(1)}</div>
+            <div class="upload-box-sub" style="color:var(--muted2)">Colado com Ctrl+V</div>`;
+        }
+        toast('📋 Imagem colada com sucesso!');
+      };
+      reader.readAsDataURL(blob);
+      break;
+    }
+  }
+});
 
 // ===== TOAST =====
 function toast(msg){
