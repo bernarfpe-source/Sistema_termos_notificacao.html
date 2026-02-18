@@ -211,6 +211,30 @@ tbody tr:hover .row-actions{opacity:1;}
 .img-thumb:hover{border-color:var(--accent);}
 .img-thumb-label{font-size:10px;color:var(--muted);text-align:center;margin-top:3px;}
 .img-thumb-wrap{display:flex;flex-direction:column;align-items:center;}
+
+.tag-nc{background:rgba(34,201,129,.15);color:#22c981;}
+.tag-tr{background:rgba(247,146,79,.15);color:#f7924f;}
+
+/* REPORTS */
+.report-filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;}
+.report-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px;}
+.report-card-title{font-family:var(--font-head);font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.report-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;}
+.rep-stat{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;}
+.rep-stat-val{font-family:var(--font-head);font-size:28px;font-weight:800;margin-bottom:4px;}
+.rep-stat-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.rep-table{width:100%;border-collapse:collapse;font-size:13px;}
+.rep-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);}
+.rep-table td{padding:9px 12px;border-bottom:1px solid var(--border);}
+.rep-table tr:last-child td{border-bottom:none;}
+.rep-table tr:hover td{background:var(--surface2);}
+.export-bar{display:flex;gap:8px;margin-bottom:16px;}
+.btn-export-pdf{background:rgba(247,92,92,.12);color:var(--red);border:1px solid rgba(247,92,92,.3);}
+.btn-export-pdf:hover{background:rgba(247,92,92,.22);}
+.btn-export-xls{background:rgba(34,201,129,.12);color:var(--green);border:1px solid rgba(34,201,129,.3);}
+.btn-export-xls:hover{background:rgba(34,201,129,.22);}
+@media print{.sidebar,.topbar,.export-bar,.report-filters button,.nav-item{display:none!important;}.main{margin-left:0!important;}.modal-overlay{display:none!important;}}
 </style>
 </head>
 <body>
@@ -274,6 +298,10 @@ tbody tr:hover .row-actions{opacity:1;}
     <div class="nav-item" onclick="abrirMinhaSenha()" style="margin-top:4px">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Minha Senha
     </div>
+    <div class="nav-section" style="margin-top:8px">Relatórios</div>
+    <div class="nav-item" onclick="showPage('relatorios')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>Relatórios
+    </div>
     <div id="nav-admin" style="display:none">
       <div class="nav-section">Administração</div>
       <div class="nav-item" onclick="showPage('usuarios')">
@@ -318,7 +346,7 @@ tbody tr:hover .row-actions{opacity:1;}
     <div class="page" id="page-lista">
       <div class="filters-bar">
         <span class="filter-label">Empresa:</span>
-        <select class="filter-select" id="f-empresa" onchange="applyFilters()"><option value="">Todas</option><option>Rio Novo</option><option>Xavante</option></select>
+        <select class="filter-select" id="f-empresa" onchange="applyFilters()"><option value="">Todas</option><option>Rio Novo</option><option>Xavante</option><option>Novo Caminho</option><option>Tarumã</option></select>
         <span class="filter-label">Órgão:</span>
         <select class="filter-select" id="f-orgao" onchange="applyFilters()"><option value="">Todos</option><option>AGER</option><option>ANTT</option></select>
         <span class="filter-label">Ano:</span>
@@ -356,7 +384,7 @@ tbody tr:hover .row-actions{opacity:1;}
         <div style="margin-bottom:20px;"><h3 style="font-family:var(--font-head);font-size:18px;font-weight:700;margin-bottom:6px;">Cadastrar Novo Termo</h3><p style="color:var(--muted2);font-size:13px;">Campos com * são obrigatórios.</p></div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:26px;">
           <div class="form-grid">
-            <div class="form-field"><label>Empresa *</label><select id="n-empresa"><option value="">Selecione</option><option>Rio Novo</option><option>Xavante</option></select></div>
+            <div class="form-field"><label>Empresa *</label><select id="n-empresa"><option value="">Selecione</option><option>Rio Novo</option><option>Xavante</option><option>Novo Caminho</option><option>Tarumã</option></select></div>
             <div class="form-field"><label>Órgão *</label><select id="n-orgao"><option value="">Selecione</option><option>AGER</option><option>ANTT</option></select></div>
             <div class="form-field"><label>Tipo *</label><select id="n-tipo"><option value="">Selecione</option><option>NOTIFICAÇÃO</option><option>RECURSO</option><option>IMPUGNAÇÃO</option><option>NOTIFICAÇÃO REGULATÓRIA</option><option>AUTUAÇÃO</option></select></div>
             <div class="form-field"><label>Nº do Termo</label><input type="text" id="n-numero" placeholder="Ex: TN-0001/2025"></div>
@@ -436,6 +464,63 @@ tbody tr:hover .row-actions{opacity:1;}
           Alterar Senha
         </button>
       </div>
+
+    <!-- RELATORIOS -->
+    <div class="page" id="page-relatorios">
+
+      <div class="report-filters">
+        <span class="filter-label">Empresa:</span>
+        <select class="filter-select" id="r-empresa" onchange="renderRelatorios()">
+          <option value="">Todas</option>
+          <option>Rio Novo</option><option>Xavante</option><option>Novo Caminho</option><option>Tarumã</option>
+        </select>
+        <span class="filter-label">Órgão:</span>
+        <select class="filter-select" id="r-orgao" onchange="renderRelatorios()">
+          <option value="">Todos</option><option>AGER</option><option>ANTT</option>
+        </select>
+        <span class="filter-label">Ano:</span>
+        <select class="filter-select" id="r-ano" onchange="renderRelatorios()">
+          <option value="">Todos</option>
+          <option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option>
+        </select>
+        <span class="filter-label">Período:</span>
+        <input type="date" class="filter-select" id="r-de" onchange="renderRelatorios()" style="width:140px">
+        <span class="filter-label">até</span>
+        <input type="date" class="filter-select" id="r-ate" onchange="renderRelatorios()" style="width:140px">
+        <button class="btn btn-ghost" onclick="limparFiltrosRel()">Limpar</button>
+        <div class="export-bar" style="margin:0;margin-left:auto">
+          <button class="btn btn-export-pdf" onclick="exportarPDF()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>PDF
+          </button>
+          <button class="btn btn-export-xls" onclick="exportarCSV()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Resumo geral -->
+      <div class="report-card" id="rep-resumo"></div>
+
+      <!-- Por empresa -->
+      <div class="report-grid">
+        <div class="report-card" id="rep-empresa"></div>
+        <div class="report-card" id="rep-orgao"></div>
+      </div>
+
+      <!-- Por status e localidade -->
+      <div class="report-grid">
+        <div class="report-card" id="rep-status"></div>
+        <div class="report-card" id="rep-local"></div>
+      </div>
+
+      <!-- Multas por empresa -->
+      <div class="report-card" id="rep-multas"></div>
+
+      <!-- Evolução mensal -->
+      <div class="report-card" id="rep-mensal"></div>
+
+    </div>
+
     </div>
 
   </div>
@@ -472,7 +557,7 @@ tbody tr:hover .row-actions{opacity:1;}
     <div class="modal-body">
       <input type="hidden" id="e-id">
       <div class="form-grid">
-        <div class="form-field"><label>Empresa *</label><select id="e-empresa"><option value="">Selecione</option><option>Rio Novo</option><option>Xavante</option></select></div>
+        <div class="form-field"><label>Empresa *</label><select id="e-empresa"><option value="">Selecione</option><option>Rio Novo</option><option>Xavante</option><option>Novo Caminho</option><option>Tarumã</option><option>Novo Caminho</option><option>Tarumã</option></select></div>
         <div class="form-field"><label>Órgão *</label><select id="e-orgao"><option value="">Selecione</option><option>AGER</option><option>ANTT</option></select></div>
         <div class="form-field"><label>Tipo *</label><select id="e-tipo"><option value="">Selecione</option><option>NOTIFICAÇÃO</option><option>RECURSO</option><option>IMPUGNAÇÃO</option><option>NOTIFICAÇÃO REGULATÓRIA</option><option>AUTUAÇÃO</option></select></div>
         <div class="form-field"><label>Nº do Termo</label><input type="text" id="e-numero"></div>
@@ -898,6 +983,7 @@ function showPage(name){
   if(name==='lista'){ filtered=[...allRecords]; currentPage=1; renderTable(); }
   if(name==='alertas') renderAlertas();
   if(name==='usuarios') renderUsuarios();
+  if(name==='relatorios') renderRelatorios();
 }
 
 // ===== DASHBOARD =====
@@ -1014,7 +1100,7 @@ function renderTable(){
   tbody.innerHTML=data.map(r=>{
     const st=getStatus(r);
     const pc=st==='vencido'?'prazo-vencido':st==='urgente'?'prazo-urgente':'prazo-date';
-    const ec=r.empresa==='Rio Novo'?'tag-rn':'tag-xv';
+    const ec=r.empresa==='Rio Novo'?'tag-rn':r.empresa==='Xavante'?'tag-xv':r.empresa==='Novo Caminho'?'tag-nc':'tag-tr';
     const oc=r.orgao==='AGER'?'tag-ager':'tag-antt';
     return `<tr onclick="openDetalhe(${r.id})">
       <td style="font-family:var(--font-head);font-size:12px;font-weight:700;color:var(--muted2)">${r.numero||'—'}</td>
@@ -1377,6 +1463,526 @@ document.addEventListener('paste', function(e) {
     }
   }
 });
+
+
+// ===== RELATÓRIOS =====
+function getRelFiltrados() {
+  const emp = document.getElementById('r-empresa')?.value || '';
+  const org = document.getElementById('r-orgao')?.value || '';
+  const ano = document.getElementById('r-ano')?.value || '';
+  const de  = document.getElementById('r-de')?.value || '';
+  const ate = document.getElementById('r-ate')?.value || '';
+  return allRecords.filter(r => {
+    if (emp && r.empresa !== emp) return false;
+    if (org && r.orgao !== org) return false;
+    if (ano && r.ano !== ano) return false;
+    if (de && r.data_entrada && r.data_entrada < de) return false;
+    if (ate && r.data_entrada && r.data_entrada > ate) return false;
+    return true;
+  });
+}
+
+function limparFiltrosRel() {
+  ['r-empresa','r-orgao','r-ano','r-de','r-ate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  renderRelatorios();
+}
+
+function barChart(data, colorFn) {
+  // data: [{label, val, extra?}]
+  const max = Math.max(...data.map(d => d.val), 1);
+  return data.map(d => `
+    <div class="bar-row">
+      <div class="bar-label" title="${d.label}">${d.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(d.val/max*100).toFixed(0)}%;background:${colorFn ? colorFn(d.label) : 'linear-gradient(90deg,var(--accent),var(--accent2))'}"></div></div>
+      <div class="bar-val">${d.val}${d.extra ? ' <span style="font-size:10px;color:var(--muted)">'+d.extra+'</span>' : ''}</div>
+    </div>`).join('');
+}
+
+function repTable(headers, rows) {
+  return `<table class="rep-table">
+    <thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function fmtMoney(v) {
+  return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+function renderRelatorios() {
+  const data = getRelFiltrados();
+  const total = data.length;
+
+  if (!total) {
+    ['rep-resumo','rep-empresa','rep-orgao','rep-status','rep-local','rep-multas','rep-mensal']
+      .forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = `<div class="report-card-title">Sem dados para os filtros selecionados.</div>`; });
+    return;
+  }
+
+  const venc = data.filter(r=>getStatus(r)==='vencido').length;
+  const urg  = data.filter(r=>getStatus(r)==='urgente').length;
+  const enc  = data.filter(r=>getStatus(r)==='encerrado').length;
+  const totalMulta = data.reduce((s,r)=>s+(parseFloat(r.valor)||0), 0);
+  const comValor = data.filter(r=>r.valor).length;
+
+  // === RESUMO ===
+  document.getElementById('rep-resumo').innerHTML = `
+    <div class="report-card-title">📊 Resumo Geral</div>
+    <div class="report-grid-3">
+      <div class="rep-stat"><div class="rep-stat-val">${total}</div><div class="rep-stat-label">Total de Processos</div></div>
+      <div class="rep-stat"><div class="rep-stat-val" style="color:var(--red)">${venc}</div><div class="rep-stat-label">Prazos Vencidos</div></div>
+      <div class="rep-stat"><div class="rep-stat-val" style="color:var(--orange)">${urg}</div><div class="rep-stat-label">Urgentes</div></div>
+      <div class="rep-stat"><div class="rep-stat-val" style="color:var(--green)">${enc}</div><div class="rep-stat-label">Encerrados</div></div>
+      <div class="rep-stat"><div class="rep-stat-val" style="color:var(--green);font-size:18px">${fmtMoney(totalMulta)}</div><div class="rep-stat-label">Total em Multas</div></div>
+      <div class="rep-stat"><div class="rep-stat-val">${comValor}</div><div class="rep-stat-label">Com Valor Informado</div></div>
+    </div>`;
+
+  // === POR EMPRESA ===
+  const empMap = {};
+  data.forEach(r => { empMap[r.empresa] = (empMap[r.empresa]||0)+1; });
+  const empData = Object.entries(empMap).sort((a,b)=>b[1]-a[1]);
+  const empColors = {'Rio Novo':'var(--accent)','Xavante':'var(--accent2)','Novo Caminho':'var(--green)','Tarumã':'var(--orange)'};
+  document.getElementById('rep-empresa').innerHTML = `
+    <div class="report-card-title">🏢 Processos por Empresa</div>
+    ${barChart(empData.map(([l,v])=>({label:l,val:v,extra:`(${(v/total*100).toFixed(0)}%)`})), l=>empColors[l]||'var(--accent)')}
+    <div style="margin-top:12px">${repTable(['Empresa','Qtd','%'],[...empData.map(([e,v])=>[e,v,(v/total*100).toFixed(1)+'%'])])}</div>`;
+
+  // === POR ÓRGÃO ===
+  const orgMap = {};
+  data.forEach(r => { orgMap[r.orgao] = (orgMap[r.orgao]||0)+1; });
+  const orgData = Object.entries(orgMap).sort((a,b)=>b[1]-a[1]);
+  const orgColors = {'AGER':'var(--green)','ANTT':'var(--yellow)'};
+  document.getElementById('rep-orgao').innerHTML = `
+    <div class="report-card-title">⚖️ Processos por Órgão</div>
+    ${barChart(orgData.map(([l,v])=>({label:l,val:v,extra:`(${(v/total*100).toFixed(0)}%)`})), l=>orgColors[l]||'var(--accent)')}
+    <div style="margin-top:12px">${repTable(['Órgão','Qtd','%'],[...orgData.map(([o,v])=>[o,v,(v/total*100).toFixed(1)+'%'])])}</div>`;
+
+  // === POR STATUS ===
+  const stMap = {vencido:0,urgente:0,ok:0,encerrado:0,pendente:0};
+  data.forEach(r=>{ stMap[getStatus(r)]++; });
+  const stColors = {vencido:'var(--red)',urgente:'var(--orange)',ok:'var(--green)',encerrado:'var(--muted)',pendente:'var(--muted2)'};
+  const stLabels = {vencido:'Vencido',urgente:'Urgente',ok:'No Prazo',encerrado:'Encerrado',pendente:'Pendente'};
+  document.getElementById('rep-status').innerHTML = `
+    <div class="report-card-title">🚦 Situação dos Prazos</div>
+    ${barChart(Object.entries(stMap).filter(([,v])=>v>0).map(([k,v])=>({label:stLabels[k],val:v})), l => {
+      const k = Object.keys(stLabels).find(k=>stLabels[k]===l);
+      return stColors[k]||'var(--accent)';
+    })}
+    <div style="margin-top:12px">${repTable(['Status','Qtd','%'],Object.entries(stMap).filter(([,v])=>v>0).map(([k,v])=>[`<span style="color:${stColors[k]}">${stLabels[k]}</span>`,v,(v/total*100).toFixed(1)+'%']))}</div>`;
+
+  // === POR LOCALIDADE ===
+  const locMap = {};
+  data.forEach(r=>{ const l=r.local||'NÃO INFORMADO'; locMap[l]=(locMap[l]||0)+1; });
+  const locData = Object.entries(locMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  document.getElementById('rep-local').innerHTML = `
+    <div class="report-card-title">📍 Processos por Localidade</div>
+    ${barChart(locData.map(([l,v])=>({label:l,val:v})))}
+    <div style="margin-top:12px">${repTable(['Local','Qtd','%'],locData.map(([l,v])=>[l,v,(v/total*100).toFixed(1)+'%']))}</div>`;
+
+  // === MULTAS POR EMPRESA ===
+  const multaEmp = {};
+  data.filter(r=>r.valor).forEach(r=>{
+    if(!multaEmp[r.empresa]) multaEmp[r.empresa]={total:0,qtd:0};
+    multaEmp[r.empresa].total += parseFloat(r.valor)||0;
+    multaEmp[r.empresa].qtd++;
+  });
+  const multaRows = Object.entries(multaEmp).sort((a,b)=>b[1].total-a[1].total);
+  document.getElementById('rep-multas').innerHTML = `
+    <div class="report-card-title">💰 Total de Multas por Empresa</div>
+    ${multaRows.length ? `
+    ${barChart(multaRows.map(([e,d])=>({label:e,val:d.total,extra:fmtMoney(d.total)})), l=>empColors[l]||'var(--accent)')}
+    <div style="margin-top:12px">${repTable(
+      ['Empresa','Qtd com Valor','Total','Média por Processo'],
+      multaRows.map(([e,d])=>[e, d.qtd, `<strong>${fmtMoney(d.total)}</strong>`, fmtMoney(d.total/d.qtd)])
+    )}
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:20px;">
+      <span style="font-size:12px;color:var(--muted)">TOTAL GERAL:</span>
+      <strong style="color:var(--green)">${fmtMoney(totalMulta)}</strong>
+    </div></div>` : '<p style="color:var(--muted);font-size:13px">Nenhum processo com valor informado.</p>'}`;
+
+  // === EVOLUÇÃO MENSAL ===
+  const mensal = {};
+  data.forEach(r=>{
+    if(!r.data_entrada) return;
+    const ym = r.data_entrada.substring(0,7);
+    mensal[ym] = (mensal[ym]||0)+1;
+  });
+  const mensalData = Object.entries(mensal).sort((a,b)=>a[0].localeCompare(b[0]));
+  const mensalFmt = ([ym]) => {
+    const [y,m] = ym.split('-');
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return `${meses[parseInt(m)-1]}/${y}`;
+  };
+  document.getElementById('rep-mensal').innerHTML = `
+    <div class="report-card-title">📅 Evolução Mensal de Autuações</div>
+    ${mensalData.length ? barChart(mensalData.map(e=>({label:mensalFmt(e),val:e[1]})),()=>'linear-gradient(90deg,var(--accent2),var(--accent))') : '<p style="color:var(--muted);font-size:13px">Sem dados de datas.</p>'}
+    ${mensalData.length ? `<div style="margin-top:12px">${repTable(['Mês/Ano','Quantidade'],mensalData.map(e=>[mensalFmt(e),e[1]]))}</div>` : ''}`;
+}
+
+// ===== EXPORT PDF =====
+function exportarPDF() {
+  // Load jsPDF dynamically
+  if (window.jspdf) { gerarPDF(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+  s.onload = () => {
+    const s2 = document.createElement('script');
+    s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+    s2.onload = gerarPDF;
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s);
+  toast('⏳ Gerando PDF...');
+}
+
+function gerarPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const data = getRelFiltrados();
+  const total = data.length;
+  const pageW = 210;
+  const margin = 14;
+  const contentW = pageW - margin * 2;
+  let y = 0;
+
+  const CORES = {
+    azul:   [79, 142, 247],
+    roxo:   [124, 92, 252],
+    verde:  [34, 201, 129],
+    amarelo:[245, 200, 66],
+    vermelho:[247, 92, 92],
+    laranja:[247, 146, 79],
+    cinza:  [156, 163, 175],
+    escuro: [17, 24, 39],
+    muted:  [107, 114, 128],
+    border: [229, 231, 235],
+    bg:     [248, 250, 252],
+  };
+
+  function novaPage() {
+    doc.addPage();
+    y = 14;
+    rodape();
+  }
+
+  function checkY(needed) {
+    if (y + needed > 272) novaPage();
+  }
+
+  function rodape() {
+    const pg = doc.internal.getCurrentPageInfo().pageNumber;
+    const total = doc.internal.getNumberOfPages();
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...CORES.muted);
+    doc.text(`Página ${pg} de ${total}`, pageW - margin, 287, {align:'right'});
+    doc.text('Sistema de Termos de Notificação — AGER / ANTT', margin, 287);
+    doc.setDrawColor(...CORES.border);
+    doc.line(margin, 283, pageW - margin, 283);
+  }
+
+  function cabecalho() {
+    // Header bar
+    doc.setFillColor(...CORES.azul);
+    doc.rect(0, 0, pageW, 28, 'F');
+    // Gradient bar (simulate with second rect)
+    doc.setFillColor(...CORES.roxo);
+    doc.rect(pageW * 0.6, 0, pageW * 0.4, 28, 'F');
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('RELATÓRIO DE TERMOS DE NOTIFICAÇÃO', margin, 12);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('AGER & ANTT — Setor Jurídico', margin, 19);
+
+    const dataStr = new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    doc.text(`Gerado em: ${dataStr}`, pageW - margin, 19, {align:'right'});
+
+    // Filtros aplicados
+    const emp = document.getElementById('r-empresa')?.value;
+    const org = document.getElementById('r-orgao')?.value;
+    const ano = document.getElementById('r-ano')?.value;
+    const de  = document.getElementById('r-de')?.value;
+    const ate = document.getElementById('r-ate')?.value;
+    let filtros = [];
+    if (emp) filtros.push('Empresa: ' + emp);
+    if (org) filtros.push('Órgão: ' + org);
+    if (ano) filtros.push('Ano: ' + ano);
+    if (de)  filtros.push('De: ' + de);
+    if (ate) filtros.push('Até: ' + ate);
+    if (filtros.length) {
+      doc.setFontSize(7.5);
+      doc.text('Filtros: ' + filtros.join(' | '), margin, 25);
+    }
+
+    y = 36;
+    rodape();
+  }
+
+  function sectionTitle(titulo, emoji) {
+    checkY(14);
+    doc.setFillColor(...CORES.bg);
+    doc.roundedRect(margin, y, contentW, 9, 1.5, 1.5, 'F');
+    doc.setDrawColor(...CORES.azul);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y + 9, margin + contentW, y + 9);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...CORES.escuro);
+    doc.text((emoji ? emoji + '  ' : '') + titulo.toUpperCase(), margin + 4, y + 6.2);
+    y += 13;
+  }
+
+  function statBoxes(items) {
+    // items: [{label, val, color}]
+    const cols = Math.min(items.length, 3);
+    const boxW = (contentW - (cols - 1) * 4) / cols;
+    checkY(22);
+    items.forEach((item, i) => {
+      const row = Math.floor(i / cols);
+      const col = i % cols;
+      if (col === 0 && i > 0) { y += 22; checkY(22); }
+      const x = margin + col * (boxW + 4);
+      const bY = y;
+
+      doc.setFillColor(...CORES.bg);
+      doc.roundedRect(x, bY, boxW, 18, 2, 2, 'F');
+      doc.setDrawColor(...CORES.border);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(x, bY, boxW, 18, 2, 2, 'S');
+
+      // colored top bar
+      doc.setFillColor(...(item.color || CORES.azul));
+      doc.roundedRect(x, bY, boxW, 2, 1, 1, 'F');
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...(item.color || CORES.escuro));
+      doc.text(String(item.val), x + boxW / 2, bY + 10, {align:'center'});
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...CORES.muted);
+      doc.text(item.label.toUpperCase(), x + boxW / 2, bY + 15, {align:'center'});
+    });
+    y += 24;
+  }
+
+  function barras(items, colorFn) {
+    // items: [{label, val, pct}]
+    const barH = 5;
+    const labelW = 55;
+    const barW = contentW - labelW - 20;
+    items.forEach(item => {
+      checkY(9);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(...CORES.escuro);
+      doc.text(String(item.label).substring(0, 30), margin, y + 4);
+
+      // track
+      doc.setFillColor(...CORES.border);
+      doc.roundedRect(margin + labelW, y, barW, barH, 1, 1, 'F');
+
+      // fill
+      const fillW = Math.max((item.pct / 100) * barW, 1);
+      const cor = colorFn ? colorFn(item.label) : CORES.azul;
+      doc.setFillColor(...cor);
+      doc.roundedRect(margin + labelW, y, fillW, barH, 1, 1, 'F');
+
+      // value
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...CORES.escuro);
+      doc.text(String(item.val), margin + labelW + barW + 3, y + 4);
+
+      y += 8;
+    });
+    y += 2;
+  }
+
+  function tabela(headers, rows, colWidths) {
+    checkY(20);
+    doc.autoTable({
+      startY: y,
+      head: [headers],
+      body: rows,
+      margin: { left: margin, right: margin },
+      columnStyles: colWidths ? Object.fromEntries(colWidths.map((w, i) => [i, {cellWidth: w}])) : {},
+      headStyles: {
+        fillColor: CORES.azul,
+        textColor: [255, 255, 255],
+        fontSize: 8,
+        fontStyle: 'bold',
+        halign: 'left',
+      },
+      bodyStyles: { fontSize: 8, textColor: CORES.escuro },
+      alternateRowStyles: { fillColor: CORES.bg },
+      tableLineColor: CORES.border,
+      tableLineWidth: 0.2,
+      didDrawPage: (d) => { y = d.cursor.y + 4; rodape(); },
+    });
+    y = doc.lastAutoTable.finalY + 6;
+  }
+
+  // ========== BUILD PDF ==========
+  cabecalho();
+
+  // ---- RESUMO ----
+  sectionTitle('Resumo Geral', '📊');
+  const venc = data.filter(r => getStatus(r) === 'vencido').length;
+  const urg  = data.filter(r => getStatus(r) === 'urgente').length;
+  const enc  = data.filter(r => getStatus(r) === 'encerrado').length;
+  const pend = data.filter(r => getStatus(r) === 'pendente').length;
+  const totalM = data.reduce((s, r) => s + (parseFloat(r.valor) || 0), 0);
+  const comVal = data.filter(r => r.valor).length;
+
+  statBoxes([
+    {label: 'Total de Processos', val: total, color: CORES.azul},
+    {label: 'Prazos Vencidos',    val: venc,  color: CORES.vermelho},
+    {label: 'Urgentes (7 dias)',  val: urg,   color: CORES.laranja},
+    {label: 'Encerrados',         val: enc,   color: CORES.verde},
+    {label: 'Com Valor Informado',val: comVal, color: CORES.muted},
+    {label: 'Total em Multas',    val: 'R$ ' + totalM.toLocaleString('pt-BR',{minimumFractionDigits:2}), color: CORES.verde},
+  ]);
+
+  // ---- POR EMPRESA ----
+  sectionTitle('Processos por Empresa', '🏢');
+  const empMap = {};
+  data.forEach(r => { empMap[r.empresa] = (empMap[r.empresa]||0)+1; });
+  const empData = Object.entries(empMap).sort((a,b)=>b[1]-a[1]);
+  const empCores = {'Rio Novo': CORES.azul, 'Xavante': CORES.roxo, 'Novo Caminho': CORES.verde, 'Tarumã': CORES.laranja};
+  barras(empData.map(([l,v])=>({label:l, val:v, pct:(v/total*100)})), l => empCores[l]||CORES.azul);
+  tabela(['Empresa','Qtd','%'], empData.map(([e,v])=>[e, v, (v/total*100).toFixed(1)+'%']), [80,20,20]);
+
+  // ---- POR ÓRGÃO ----
+  sectionTitle('Processos por Órgão', '⚖️');
+  const orgMap = {};
+  data.forEach(r => { orgMap[r.orgao] = (orgMap[r.orgao]||0)+1; });
+  const orgData = Object.entries(orgMap).sort((a,b)=>b[1]-a[1]);
+  const orgCores = {'AGER': CORES.verde, 'ANTT': CORES.amarelo};
+  barras(orgData.map(([l,v])=>({label:l, val:v, pct:(v/total*100)})), l => orgCores[l]||CORES.azul);
+  tabela(['Órgão','Qtd','%'], orgData.map(([o,v])=>[o, v, (v/total*100).toFixed(1)+'%']), [80,20,20]);
+
+  // ---- POR STATUS ----
+  sectionTitle('Situação dos Prazos', '🚦');
+  const stMap = {vencido:0,urgente:0,ok:0,encerrado:0,pendente:0};
+  data.forEach(r => { stMap[getStatus(r)]++; });
+  const stLabels = {vencido:'Vencido',urgente:'Urgente',ok:'No Prazo',encerrado:'Encerrado',pendente:'Pendente'};
+  const stCores = {vencido:CORES.vermelho,urgente:CORES.laranja,ok:CORES.verde,encerrado:CORES.cinza,pendente:CORES.muted};
+  const stEntries = Object.entries(stMap).filter(([,v])=>v>0);
+  barras(stEntries.map(([k,v])=>({label:stLabels[k], val:v, pct:(v/total*100)})), l => {
+    const k = Object.keys(stLabels).find(k=>stLabels[k]===l);
+    return stCores[k]||CORES.azul;
+  });
+  tabela(['Status','Qtd','%'], stEntries.map(([k,v])=>[stLabels[k], v, (v/total*100).toFixed(1)+'%']), [80,20,20]);
+
+  // ---- POR LOCALIDADE ----
+  sectionTitle('Processos por Localidade', '📍');
+  const locMap = {};
+  data.forEach(r => { const l=r.local||'NÃO INFORMADO'; locMap[l]=(locMap[l]||0)+1; });
+  const locData = Object.entries(locMap).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  barras(locData.map(([l,v])=>({label:l, val:v, pct:(v/total*100)})));
+  tabela(['Localidade','Qtd','%'], locData.map(([l,v])=>[l, v, (v/total*100).toFixed(1)+'%']), [100,15,15]);
+
+  // ---- MULTAS POR EMPRESA ----
+  sectionTitle('Total de Multas por Empresa', '💰');
+  const multaEmp = {};
+  data.filter(r=>r.valor).forEach(r => {
+    if(!multaEmp[r.empresa]) multaEmp[r.empresa]={total:0,qtd:0};
+    multaEmp[r.empresa].total += parseFloat(r.valor)||0;
+    multaEmp[r.empresa].qtd++;
+  });
+  const multaRows = Object.entries(multaEmp).sort((a,b)=>b[1].total-a[1].total);
+  if (multaRows.length) {
+    const maxM = multaRows[0][1].total;
+    barras(multaRows.map(([e,d])=>({label:e, val:'R$'+d.total.toLocaleString('pt-BR',{minimumFractionDigits:2}), pct:(d.total/maxM*100)})), l=>empCores[l]||CORES.azul);
+    tabela(
+      ['Empresa','Qtd c/ Valor','Total (R$)','Média (R$)'],
+      [...multaRows.map(([e,d])=>[e, d.qtd,
+        d.total.toLocaleString('pt-BR',{minimumFractionDigits:2}),
+        (d.total/d.qtd).toLocaleString('pt-BR',{minimumFractionDigits:2})
+      ]),
+      ['TOTAL GERAL', comVal, totalM.toLocaleString('pt-BR',{minimumFractionDigits:2}), '']],
+      [55, 25, 40, 40]
+    );
+  } else {
+    doc.setFont('helvetica','italic');
+    doc.setFontSize(9);
+    doc.setTextColor(...CORES.muted);
+    doc.text('Nenhum processo com valor de multa informado.', margin, y);
+    y += 8;
+  }
+
+  // ---- EVOLUÇÃO MENSAL ----
+  sectionTitle('Evolução Mensal de Autuações', '📅');
+  const mensal = {};
+  data.forEach(r => {
+    if(!r.data_entrada) return;
+    const ym = r.data_entrada.substring(0,7);
+    mensal[ym] = (mensal[ym]||0)+1;
+  });
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const mensalData = Object.entries(mensal).sort((a,b)=>a[0].localeCompare(b[0]));
+  const mensalMax = Math.max(...mensalData.map(([,v])=>v),1);
+  if (mensalData.length) {
+    barras(mensalData.map(([ym,v]) => {
+      const [yr,m] = ym.split('-');
+      return {label: `${meses[parseInt(m)-1]}/${yr}`, val:v, pct:(v/mensalMax*100)};
+    }), () => CORES.roxo);
+    tabela(
+      ['Mês/Ano','Quantidade'],
+      mensalData.map(([ym,v]) => {
+        const [yr,m] = ym.split('-');
+        return [`${meses[parseInt(m)-1]}/${yr}`, v];
+      }),
+      [80, 30]
+    );
+  }
+
+  // ---- LISTAGEM COMPLETA ----
+  novaPage();
+  sectionTitle('Listagem Completa dos Processos', '📋');
+  tabela(
+    ['Nº','Empresa','Órgão','Tipo','Assunto','Local','Prazo','Status'],
+    data.map(r => [
+      r.numero||'—', r.empresa||'—', r.orgao||'—', r.tipo||'—',
+      (r.assunto||'—').substring(0,30),
+      (r.local||'—').substring(0,20),
+      prazoFmt(r),
+      SL[getStatus(r)]
+    ]),
+    [18, 25, 12, 22, 40, 28, 18, 17]
+  );
+
+  // Save
+  const nome = `relatorio_termos_${new Date().toISOString().slice(0,10)}.pdf`;
+  doc.save(nome);
+  toast('✅ PDF gerado e baixado!');
+}
+
+// ===== EXPORT CSV =====
+function exportarCSV() {
+  const data = getRelFiltrados();
+  const headers = ['Nº','Empresa','Órgão','Tipo','Assunto','Local','Placa','Data Entrada','Prazo','Status','Valor'];
+  const rows = data.map(r => [
+    r.numero||'', r.empresa||'', r.orgao||'', r.tipo||'', r.assunto||'',
+    r.local||'', r.placa||'', r.data_entrada||'', r.prazo||'',
+    SL[getStatus(r)], r.valor||''
+  ]);
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `relatorio_termos_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('✅ CSV exportado!');
+}
 
 // ===== TOAST =====
 function toast(msg){
