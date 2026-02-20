@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -313,6 +314,11 @@ tbody tr:hover .row-actions{opacity:1;}
 </nav>
 
 <main class="main">
+  <div id="local-banner" style="display:none;background:linear-gradient(90deg,rgba(79,142,247,.15),rgba(124,92,252,.1));border-bottom:1px solid var(--border);padding:6px 24px;font-size:12px;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:8px;">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+    <span id="local-banner-text"></span>
+    <span style="color:var(--muted);font-weight:400">— Você está visualizando apenas processos desta localidade</span>
+  </div>
   <div class="topbar">
     <h2 id="page-title">Dashboard</h2>
     <div class="search-wrap">
@@ -449,7 +455,7 @@ tbody tr:hover .row-actions{opacity:1;}
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Login</th><th>Nome</th><th>Perfil</th><th>Ações</th></tr></thead>
+          <thead><tr><th>Login</th><th>Nome</th><th>Perfil</th><th>Localidade</th><th>Ações</th></tr></thead>
           <tbody id="users-tbody"></tbody>
         </table>
       </div>
@@ -625,9 +631,22 @@ tbody tr:hover .row-actions{opacity:1;}
         <div class="form-field"><label>Login (Usuário) *</label><input type="text" id="u-user" placeholder="Ex: JOAO" style="text-transform:uppercase"></div>
         <div class="form-field"><label>Nome Completo *</label><input type="text" id="u-nome" placeholder="Ex: JOÃO SILVA"></div>
         <div class="form-field"><label>Perfil</label>
-          <select id="u-role">
+          <select id="u-role" onchange="toggleLocalField()">
             <option value="user">Usuário</option>
             <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div class="form-field" id="u-local-field">
+          <label>Localidade Vinculada *</label>
+          <select id="u-local">
+            <option value="">Selecione a localidade</option>
+            <option>GOIÂNIA/GO</option>
+            <option>BARRA DO GARÇAS/MT</option>
+            <option>RIBEIRÃO CASCALHEIRA/MT</option>
+            <option>VILA RICA/MT</option>
+            <option>CUIABÁ/MT</option>
+            <option>SINOP/MT</option>
+            <option>IMPERATRIZ/MA</option>
           </select>
         </div>
         <div class="form-field" id="u-pass-row">
@@ -748,11 +767,23 @@ function doLogin() {
   currentUser = found;
   document.getElementById('login-error').style.display = 'none';
   document.getElementById('login-overlay').style.display = 'none';
-  document.getElementById('logged-user').textContent = '👤 ' + found.nome;
-  sessionStorage.setItem('tn_logged', JSON.stringify({user: found.user, nome: found.nome, role: found.role||'user'}));
+  const localLabel = found.local ? ` · ${found.local}` : '';
+  document.getElementById('logged-user').textContent = '👤 ' + found.nome + localLabel;
+  sessionStorage.setItem('tn_logged', JSON.stringify({user: found.user, nome: found.nome, role: found.role||'user', local: found.local||''}));
   // Show admin nav if admin
   const adminNav = document.getElementById('nav-admin');
   if (adminNav) adminNav.style.display = found.role === 'admin' ? 'block' : 'none';
+  // Show localidade banner
+  const banner = document.getElementById('local-banner');
+  const bannerText = document.getElementById('local-banner-text');
+  if (banner && bannerText) {
+    if (found.local && found.role !== 'admin') {
+      bannerText.textContent = found.local;
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
 }
 
 function doLogout() {
@@ -764,6 +795,8 @@ function doLogout() {
   document.getElementById('logged-user').textContent = '';
   const adminNav = document.getElementById('nav-admin');
   if (adminNav) adminNav.style.display = 'none';
+  const banner = document.getElementById('local-banner');
+  if (banner) banner.style.display = 'none';
 }
 
 function togglePass() {
@@ -789,9 +822,20 @@ function togglePassById(inpId, eyeId) {
       const d = JSON.parse(s);
       currentUser = getAllUsers().find(x => x.user === d.user) || null;
       document.getElementById('login-overlay').style.display = 'none';
-      document.getElementById('logged-user').textContent = '👤 ' + d.nome;
+      const localLabel = d.local ? ` · ${d.local}` : '';
+      document.getElementById('logged-user').textContent = '👤 ' + d.nome + localLabel;
       const adminNav = document.getElementById('nav-admin');
       if (adminNav) adminNav.style.display = d.role === 'admin' ? 'block' : 'none';
+      const banner = document.getElementById('local-banner');
+      const bannerText = document.getElementById('local-banner-text');
+      if (banner && bannerText) {
+        if (d.local && d.role !== 'admin') {
+          bannerText.textContent = d.local;
+          banner.style.display = 'flex';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
     } catch(e) {}
   }
 })();
@@ -812,12 +856,19 @@ function renderUsuarios() {
     <tr>
       <td style="font-family:var(--font-head);font-weight:700">${u.user}</td>
       <td>${u.nome}</td>
-      <td><span class="tag tag-ager">${u.role === 'admin' ? 'Admin' : 'Usuário'}</span></td>
+      <td><span class="tag ${u.role==='admin'?'tag-ager':'tag-rn'}">${u.role === 'admin' ? 'Admin' : 'Usuário'}</span></td>
+      <td style="font-size:12px;color:var(--muted2)">${u.local || u.role==='admin'?'<span style="color:var(--accent);font-size:11px">🌐 TODAS</span>':u.local||'<span style="color:var(--red)">⚠ Não definida</span>'}</td>
       <td style="display:flex;gap:6px;">
         <button class="btn btn-edit" style="padding:5px 10px;font-size:12px" onclick="abrirEditUser(${i})">✏️ Editar</button>
         <button class="btn btn-danger" style="padding:5px 10px;font-size:12px" onclick="excluirUser(${i})">🗑️ Excluir</button>
       </td>
     </tr>`).join('');
+}
+
+function toggleLocalField() {
+  const role = document.getElementById('u-role').value;
+  const lf = document.getElementById('u-local-field');
+  if (lf) lf.style.display = role === 'admin' ? 'none' : '';
 }
 
 function abrirNovoUser() {
@@ -828,7 +879,9 @@ function abrirNovoUser() {
   document.getElementById('u-pass').value = '';
   document.getElementById('u-pass2').value = '';
   document.getElementById('u-role').value = 'user';
+  document.getElementById('u-local').value = '';
   document.getElementById('u-pass-row').style.display = '';
+  toggleLocalField();
   document.getElementById('user-modal-overlay').classList.add('open');
 }
 
@@ -843,7 +896,9 @@ function abrirEditUser(i) {
   document.getElementById('u-pass').value = '';
   document.getElementById('u-pass2').value = '';
   document.getElementById('u-role').value = u.role || 'user';
+  document.getElementById('u-local').value = u.local || '';
   document.getElementById('u-pass-row').style.display = '';
+  toggleLocalField();
   document.getElementById('user-modal-overlay').classList.add('open');
 }
 
@@ -855,8 +910,10 @@ function salvarUser() {
   const pass2 = document.getElementById('u-pass2').value.trim();
   const role = document.getElementById('u-role').value;
 
+  const local = document.getElementById('u-local').value;
   if (!user || !nome) { alert('Preencha usuário e nome.'); return; }
   if (user === 'ADMIN') { alert('Não é possível criar um usuário com o nome ADMIN.'); return; }
+  if (role !== 'admin' && !local) { alert('Selecione a localidade vinculada ao usuário.'); return; }
 
   const users = loadUsers();
 
@@ -875,9 +932,9 @@ function salvarUser() {
   if (dupIdx !== -1) { alert('Já existe um usuário com esse nome.'); return; }
 
   if (idx === -1) {
-    users.push({ user, nome, pass, role });
+    users.push({ user, nome, pass, role, local: role === 'admin' ? '' : local });
   } else {
-    users[idx] = { user, nome, pass: pass || users[idx].pass, role };
+    users[idx] = { user, nome, pass: pass || users[idx].pass, role, local: role === 'admin' ? '' : local };
   }
 
   saveUsers(users);
@@ -944,6 +1001,20 @@ function abrirAlterarSenhaAdmin() {
 function loadRecords(){ try{ const s=localStorage.getItem('tn_records'); return s?JSON.parse(s):[]; }catch(e){ return []; } }
 function saveRecords(){ try{ localStorage.setItem('tn_records',JSON.stringify(allRecords)); }catch(e){} }
 
+// Retorna a localidade restrita do usuário logado, ou null se admin
+function getUserLocal() {
+  if (!currentUser) return null;
+  if (currentUser.role === 'admin') return null;
+  return currentUser.local || null;
+}
+
+// Retorna apenas os registros que o usuário tem permissão de ver
+function getRecordsPermitidos() {
+  const local = getUserLocal();
+  if (!local) return allRecords; // admin vê tudo
+  return allRecords.filter(r => (r.local || '') === local);
+}
+
 let allRecords = loadRecords();
 const TODAY = new Date('2026-02-18');
 
@@ -980,7 +1051,7 @@ function showPage(name){
   const ni=document.querySelector(`.nav-item[onclick*="'${name}'"]`);
   if(ni) ni.classList.add('active');
   if(name==='dashboard') renderDashboard();
-  if(name==='lista'){ filtered=[...allRecords]; currentPage=1; renderTable(); }
+  if(name==='lista'){ filtered=[...getRecordsPermitidos()]; currentPage=1; renderTable(); }
   if(name==='alertas') renderAlertas();
   if(name==='usuarios') renderUsuarios();
   if(name==='relatorios') renderRelatorios();
@@ -988,21 +1059,23 @@ function showPage(name){
 
 // ===== DASHBOARD =====
 function renderDashboard(){
-  const total=allRecords.length;
-  const venc=allRecords.filter(r=>getStatus(r)==='vencido').length;
-  const urg=allRecords.filter(r=>getStatus(r)==='urgente').length;
-  const enc=allRecords.filter(r=>getStatus(r)==='encerrado').length;
-  const multas = totalMultas();
+  const dashData = getRecordsPermitidos();
+  const total=dashData.length;
+  const venc=dashData.filter(r=>getStatus(r)==='vencido').length;
+  const urg=dashData.filter(r=>getStatus(r)==='urgente').length;
+  const enc=dashData.filter(r=>getStatus(r)==='encerrado').length;
+  const multas = dashData.reduce((s,r)=>s+(parseFloat(r.valor)||0),0);
   const multaFmt = multas.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const localLabel = getUserLocal() ? ` — ${getUserLocal()}` : '';
   document.getElementById('stats-grid').innerHTML=`
-    <div class="stat-card blue"><div class="stat-label">Total de Processos</div><div class="stat-value">${total}</div><div class="stat-sub">Todos os registros</div></div>
+    <div class="stat-card blue"><div class="stat-label">Total de Processos${localLabel}</div><div class="stat-value">${total}</div><div class="stat-sub">Todos os registros</div></div>
     <div class="stat-card red"><div class="stat-label">Prazos Vencidos</div><div class="stat-value" style="color:var(--red)">${venc}</div><div class="stat-sub">Requerem atenção</div></div>
     <div class="stat-card yellow"><div class="stat-label">Urgentes (7 dias)</div><div class="stat-value" style="color:var(--yellow)">${urg}</div><div class="stat-sub">Em alerta</div></div>
-    <div class="stat-card green" style="grid-column:span 1"><div class="stat-label">💰 Total em Multas</div><div class="stat-value" style="font-size:20px;color:var(--green)">R$ ${multaFmt}</div><div class="stat-sub">${allRecords.filter(r=>r.valor).length} proc. com valor</div></div>`;
+    <div class="stat-card green" style="grid-column:span 1"><div class="stat-label">💰 Total em Multas</div><div class="stat-value" style="font-size:20px;color:var(--green)">R$ ${multaFmt}</div><div class="stat-sub">${dashData.filter(r=>r.valor).length} proc. com valor</div></div>`;
   updateBadges();
   // Assuntos
   const ac={};
-  allRecords.forEach(r=>{ const a=r.assunto||'Outros'; ac[a]=(ac[a]||0)+1; });
+  dashData.forEach(r=>{ const a=r.assunto||'Outros'; ac[a]=(ac[a]||0)+1; });
   const top=Object.entries(ac).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const mx=top[0]?.[1]||1;
   document.getElementById('chart-assuntos').innerHTML=top.map(([a,c])=>`
@@ -1011,7 +1084,7 @@ function renderDashboard(){
     <div class="bar-val">${c}</div></div>`).join('');
   // Donut
   const grp={};
-  allRecords.forEach(r=>{ const k=`${r.empresa}/${r.orgao}`; grp[k]=(grp[k]||0)+1; });
+  dashData.forEach(r=>{ const k=`${r.empresa}/${r.orgao}`; grp[k]=(grp[k]||0)+1; });
   const colors=['#4f8ef7','#7c5cfc','#22c981','#f5c842','#f75c5c'];
   const ents=Object.entries(grp).sort((a,b)=>b[1]-a[1]);
   document.getElementById('legend-orgao').innerHTML=ents.map(([k,c],i)=>`
@@ -1019,7 +1092,7 @@ function renderDashboard(){
   drawDonut('canvas-orgao',ents.map(([,c])=>c),colors);
   // Anos
   const an={};
-  allRecords.forEach(r=>{ an[r.ano]=(an[r.ano]||0)+1; });
+  dashData.forEach(r=>{ an[r.ano]=(an[r.ano]||0)+1; });
   const anos=Object.entries(an).sort((a,b)=>a[0].localeCompare(b[0]));
   const mxa=Math.max(...anos.map(a=>a[1]),1);
   document.getElementById('chart-anos').innerHTML=anos.map(([a,c])=>`
@@ -1028,7 +1101,7 @@ function renderDashboard(){
     <div class="bar-val">${c}</div></div>`).join('');
   // Status prazos
   const sc2={vencido:0,urgente:0,ok:0,encerrado:0,pendente:0};
-  allRecords.forEach(r=>{ sc2[getStatus(r)]++; });
+  dashData.forEach(r=>{ sc2[getStatus(r)]++; });
   const scC={vencido:'var(--red)',urgente:'var(--orange)',ok:'var(--green)',encerrado:'var(--muted)',pendente:'var(--muted2)'};
   const tot=Math.max(Object.values(sc2).reduce((a,b)=>a+b,0),1);
   document.getElementById('chart-status').innerHTML=Object.entries(sc2).map(([k,c])=>`
@@ -1067,7 +1140,8 @@ function applyFilters(){
   const ano=document.getElementById('f-ano').value;
   const tipo=document.getElementById('f-tipo').value;
   const q=searchQ.toLowerCase();
-  filtered=allRecords.filter(r=>{
+  const permitidos = getRecordsPermitidos();
+  filtered=permitidos.filter(r=>{
     if(emp&&r.empresa!==emp) return false;
     if(org&&r.orgao!==org) return false;
     if(ano&&r.ano!==ano) return false;
@@ -1146,9 +1220,10 @@ function goPage(p){ currentPage=p; renderTable(); }
 
 // ===== ALERTAS =====
 function renderAlertas(){
-  const venc=allRecords.filter(r=>getStatus(r)==='vencido');
-  const urg=allRecords.filter(r=>getStatus(r)==='urgente');
-  const ok=allRecords.filter(r=>getStatus(r)==='ok');
+  const alertData = getRecordsPermitidos();
+  const venc=alertData.filter(r=>getStatus(r)==='vencido');
+  const urg=alertData.filter(r=>getStatus(r)==='urgente');
+  const ok=alertData.filter(r=>getStatus(r)==='ok');
   document.getElementById('alerta-vencidos').textContent=venc.length;
   document.getElementById('alerta-urgentes').textContent=urg.length;
   document.getElementById('alerta-ok').textContent=ok.length;
@@ -1472,7 +1547,7 @@ function getRelFiltrados() {
   const ano = document.getElementById('r-ano')?.value || '';
   const de  = document.getElementById('r-de')?.value || '';
   const ate = document.getElementById('r-ate')?.value || '';
-  return allRecords.filter(r => {
+  return getRecordsPermitidos().filter(r => {
     if (emp && r.empresa !== emp) return false;
     if (org && r.orgao !== org) return false;
     if (ano && r.ano !== ano) return false;
@@ -2008,8 +2083,9 @@ function toggleTheme(){
 
 // ===== BADGES =====
 function updateBadges(){
-  document.getElementById('badge-vencidos').textContent=allRecords.filter(r=>getStatus(r)==='vencido').length;
-  document.getElementById('badge-alertas').textContent=allRecords.filter(r=>['vencido','urgente'].includes(getStatus(r))).length;
+  const bp = getRecordsPermitidos();
+  document.getElementById('badge-vencidos').textContent=bp.filter(r=>getStatus(r)==='vencido').length;
+  document.getElementById('badge-alertas').textContent=bp.filter(r=>['vencido','urgente'].includes(getStatus(r))).length;
 }
 
 // ===== INIT =====
